@@ -15,11 +15,11 @@ import Position from '../engine/model/position.js';
  * @extends core.command.Command
  */
 export default class EnterCommand extends Command {
-	_doExecute() {
+	_doExecute( defaultBlockName = null ) {
 		const doc = this.editor.document;
 
 		doc.enqueueChanges( () => {
-			enterBlock( doc.batch(), doc.selection, { defaultBlockName: 'paragraph' } );
+			enterBlock( doc.batch(), doc.selection, { defaultBlockName } );
 		} );
 	}
 }
@@ -64,16 +64,13 @@ export function enterBlock( batch, selection, options = {} ) {
 		// <h>[xx</h><p>yy]<p>	-> <h>^</h>				-> <p>^</p>
 		// <h>[xxyy]</h>		-> <h>^</h>				-> <p>^</p>
 		if ( shouldMerge ) {
-			// We'll lose the ref to the renamed element, so let's keep a position inside it
-			// (offsets won't change, so it will stay in place). See ckeditor5-engine#367.
-			const pos = Position.createFromPosition( selection.focus );
-			const newBlockName = getNewBlockName( doc, startElement, defaultBlockName );
+			if ( defaultBlockName ) {
+				const newBlockName = getNewBlockName( doc, startElement, defaultBlockName );
 
-			if ( startElement.name != newBlockName ) {
-				batch.rename( newBlockName, startElement );
+				if ( startElement.name != newBlockName ) {
+					batch.rename( newBlockName, startElement );
+				}
 			}
-
-			selection.collapse( pos );
 		}
 		// Partially selected elements.
 		//
@@ -81,7 +78,7 @@ export function enterBlock( batch, selection, options = {} ) {
 		else if ( isContainedWithinOneElement ) {
 			splitBlock( batch, selection, selection.focus, defaultBlockName );
 		}
-		// Selection over multilpe elements.
+		// Selection over multiple elements.
 		//
 		// <h>x[x</h><p>y]y<p>	-> <h>x^</h><p>y</p>	-> <h>x</h><p>^y</p>
 		else {
@@ -94,7 +91,7 @@ function splitBlock( batch, selection, splitPos, defaultBlockName ) {
 	const doc = batch.document;
 	const parent = splitPos.parent;
 
-	if ( splitPos.isAtEnd ) {
+	if ( defaultBlockName && splitPos.isAtEnd ) {
 		const newElement = new Element( getNewBlockName( doc, parent, defaultBlockName ) );
 
 		batch.insert( Position.createAfter( parent ), newElement );

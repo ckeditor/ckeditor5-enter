@@ -40,15 +40,6 @@ describe( 'EnterCommand', () => {
 		expect( getData( doc, { withoutSelection: true } ) ).to.equal( '<p>foo</p><p></p>' );
 		expect( spy.calledOnce ).to.be.true;
 	} );
-
-	it( 'uses paragraph as default block', () => {
-		schema.registerItem( 'paragraph', '$block' );
-		setData( doc, '<h>foo[]</h>' );
-
-		editor.execute( 'enter' );
-
-		expect( getData( doc, { withoutSelection: true } ) ).to.equal( '<h>foo</h><paragraph></paragraph>' );
-	} );
 } );
 
 describe( 'enterBlock', () => {
@@ -107,6 +98,13 @@ describe( 'enterBlock', () => {
 			'<h>foo[]</h><p>x</p>',
 			'<h>foo</h><h>[]</h><p>x</p>',
 			{ defaultBlockName: 'xxx' }
+		);
+
+		test(
+			'renames block when default block is allowed',
+			'<h>foo[]</h><p>x</p>',
+			'<h>foo</h><p>[]</p><p>x</p>',
+			{ defaultBlockName: 'p' }
 		);
 
 		test(
