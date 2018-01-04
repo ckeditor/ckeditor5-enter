@@ -21,10 +21,16 @@ export default class EnterObserver extends Observer {
 		super( document );
 
 		document.on( 'keydown', ( evt, data ) => {
-			if ( this.isEnabled && data.keyCode == keyCodes.enter ) {
+			// Do not handle if specific event like `keydown:enter` is fired.
+			// https://github.com/ckeditor/ckeditor5/issues/753
+			if ( this.isEnabled && data.keyCode == keyCodes.enter && evt.name == 'keydown' ) {
 				document.fire( 'enter', new DomEventData( document, data.domEvent ) );
+
+				// Stop generic `keydown` event and fire specific `keydown:enter` event.
+				evt.stop();
+				document.fire( 'keydown:enter', data );
 			}
-		} );
+		}, { priority: 'highest' } );
 	}
 
 	/**
@@ -41,4 +47,14 @@ export default class EnterObserver extends Observer {
  *
  * @event module:engine/view/document~Document#event:enter
  * @param {module:engine/view/observer/domeventdata~DomEventData} data
+ */
+
+/**
+ * Fired when a keydown event was handled by {@link module:enter/enterobserver~EnterObserver}.
+ * It can be used to determine if the event was handled by {@link module:enter/enterobserver~EnterObserver} or it is
+ * a generic event created by {@link module:engine/view/observer/keyobserver~KeyObserver}.
+ *
+ * @see module:engine/view/observer/keyobserver~KeyObserver
+ * @event module:engine/view/document~Document#event:keydown:enter
+ * @param {module:engine/view/observer/keyobserver~KeyEventData} keyEventData
  */
