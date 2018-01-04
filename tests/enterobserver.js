@@ -9,7 +9,7 @@ import ViewDocument from '@ckeditor/ckeditor5-engine/src/view/document';
 import EnterObserver from '../src/enterobserver';
 import DomEventData from '@ckeditor/ckeditor5-engine/src/view/observer/domeventdata';
 import { getCode } from '@ckeditor/ckeditor5-utils/src/keyboard';
-import priorities from '../../ckeditor5-utils/src/priorities';
+import priorities from '@ckeditor/ckeditor5-utils/src/priorities';
 
 describe( 'EnterObserver', () => {
 	let viewDocument;
