@@ -28,7 +28,9 @@ export default class EnterObserver extends Observer {
 				let event;
 				document.once( 'enter', evt => ( event = evt ), { priority: 'highest' } );
 
-				document.fire( 'enter', new DomEventData( document, data.domEvent ) );
+				document.fire( 'enter', new DomEventData( document, data.domEvent, {
+					isSoft: data.shiftKey
+				} ) );
 
 				// Stop `keydown` event if `enter` event was stopped.
 				// https://github.com/ckeditor/ckeditor5/issues/753
@@ -49,7 +51,8 @@ export default class EnterObserver extends Observer {
  * Event fired when the user presses the <kbd>Enter</kbd> key.
  *
  * Note: This event is fired by the {@link module:enter/enterobserver~EnterObserver observer}
- * (usually registered by the {@link module:enter/enter~Enter Enter feature}).
+ * (usually registered by the {@link module:enter/enter~Enter Enter feature} and
+ * {@link module:enter/softenter~SoftEnter SoftEnter feature}).
  *
  * @event module:engine/view/document~Document#event:enter
  * @param {module:engine/view/observer/domeventdata~DomEventData} data
